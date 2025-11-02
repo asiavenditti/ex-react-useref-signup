@@ -1,13 +1,107 @@
 import { useState } from 'react'
 import './App.css'
 
+
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~"
+
+
+
 function App() {
+  // stati del form
   const [fullName, setFullName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [specialization, setSpecialization] = useState('')
   const [experience, setExperience] = useState(0)
   const [description, setDescription] = useState('')
+  // stati di errore 
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [descriptionError, setDescriptionError] = useState('')
+
+
+  const validateUsername = (value) => {
+    // controllo sulla lunghezza
+    if (value.length < 6) {
+      setUsernameError('Username troppo corto, minimo 6 caratteri')
+      return
+    }
+
+    // 2. controllo sugli spazi
+    if (value.includes(' ')) {
+      setUsernameError('Username non valido, non sono consentiti spazi')
+      return
+    }
+
+    // 3. controllo sui simboli
+    for (let char of value) {
+      if (symbols.includes(char)) {
+        setUsernameError('Username non valido, non sono consentiti caratteri speciali')
+        return
+      }
+    }
+
+    setUsernameError('')
+  }
+
+  const validatePassword = (value) => {
+    // controllo lunghezza
+    if (value.length < 8) {
+      setPasswordError(`Passowrd non valida. Deve contenere almeno 8 caratteri`)
+      return
+    }
+    // controllo spazi
+    if (value.includes(' ')) {
+      setPasswordError(`Password non valida. Non sono consentiti spazi`)
+      return
+    }
+    // controllo caratteri richiesti
+    let includesLetter = false
+    let includesNumber = false
+    let includesSymbol = false
+
+    for (let char of value) {
+      if (letters.includes(char)) includesLetter = true
+      if (numbers.includes(char)) includesNumber = true
+      if (symbols.includes(char)) includesSymbol = true
+    }
+    // se non include una lettera
+    if (!includesLetter) {
+      setPasswordError('Errore. La password deve contenere almeno 1 lettera')
+      return
+    }
+    // se non include un numero
+    if (!includesNumber) {
+      setPasswordError('Errore. La password deve contentere almeno 1 numbero')
+      return
+    }
+    // se non include simboli
+    if (!includesSymbol) {
+      setPasswordError('Errore. La password deve contenere almeno 1 carattere speciale')
+      return
+    }
+
+    setPasswordError('')
+  }
+
+  const validateDescription = (value) => {
+    // controllo se è troppo corta (senza contare gli spazi)
+
+    if (value.trim().length < 100) {
+      setDescriptionError(`La descrizione è troppo corta. Deve contenere almeno 100 caratteri.`)
+      return
+    }
+
+    // controllo se è troppo lunga (senza contare gli spazi)
+    if (value.trim().length > 1000) {
+      setDescriptionError(`La descrizione è troppo lunga. Deve contenere massimo 1000 caratteri.`)
+      return
+    }
+    setDescriptionError('')
+  }
+
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -42,9 +136,16 @@ function App() {
                     className="form-control"
                     placeholder="mariorossi123"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      setUsername(e.target.value)
+                      validateUsername(e.target.value)
+                    }}
                   />
                 </div>
+                {/* Erorre Username */}
+                {usernameError && (
+                  <span className='text-danger'>{usernameError}</span>
+                )}
 
                 <div className="mb-3">
                   <label className="form-label">Password</label>
@@ -53,9 +154,16 @@ function App() {
                     className="form-control"
                     placeholder="Inserisci la tua password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      validatePassword(e.target.value)
+                    }}
                   />
                 </div>
+                {/* Errore Password */}
+                {passwordError && (
+                  <span className='text-danger'>{passwordError}</span>
+                )}
 
                 <div className="mb-3">
                   <label className="form-label">Specializzazione</label>
@@ -89,9 +197,17 @@ function App() {
                     rows="8"
                     placeholder="Raccontaci di te..."
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => {
+                      setDescription(e.target.value)
+                      validateDescription(e.target.value)
+                    }}
                   />
                 </div>
+                {/* Errore Descrizione */}
+
+                {descriptionError && (
+                  <span className='text-danger'>{descriptionError}</span>
+                )}
 
                 <button type="submit" className="btn btn-primary w-100">
                   Conferma i tuoi dati

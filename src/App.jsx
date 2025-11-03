@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 
 
@@ -9,18 +9,22 @@ const symbols = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~"
 
 
 function App() {
-  // stati del form
-  const [fullName, setFullName] = useState('')
+  // stati controllati del form
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [specialization, setSpecialization] = useState('')
-  const [experience, setExperience] = useState(0)
   const [description, setDescription] = useState('')
   // stati di errore 
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [descriptionError, setDescriptionError] = useState('')
+  // stati non controllati
+  const fullNameRef = useRef(null)
+  const specializationRef = useRef(null)
+  const experienceRef = useRef(null)
 
+
+
+  // validazione di stati controllati 
 
   const validateUsername = (value) => {
     // controllo sulla lunghezza
@@ -103,10 +107,27 @@ function App() {
   }
 
 
+
+
   function handleSubmit(e) {
     e.preventDefault()
-  }
 
+    const fullName = fullNameRef.current.value
+    const specialization = specializationRef.current.value
+    const experience = experienceRef.current.value
+
+    // validazioni al submit
+
+    if (!fullName || !specialization) {
+      alert('Compila tutti i campi per poter proseguire')
+    }
+    if (experience < 0) {
+      alert('Non sono consentiti numeri negativi')
+    }
+
+    console.log('Complimenti! Hai compeltato la registrazione con successo')
+
+  }
 
   return (
     <div className="container my-5">
@@ -123,9 +144,9 @@ function App() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Mario Rossi"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Inserisci il tuo nome completo"
+                    ref={fullNameRef}
+
                   />
                 </div>
 
@@ -169,8 +190,8 @@ function App() {
                   <label className="form-label">Specializzazione</label>
                   <select
                     className="form-select"
-                    value={specialization}
-                    onChange={(e) => setSpecialization(e.target.value)}
+                    ref={specializationRef}
+
                   >
                     <option value="">Seleziona specializzazione</option>
                     <option value="Full Stack">Full Stack</option>
@@ -185,8 +206,8 @@ function App() {
                     type="number"
                     className="form-control"
                     min="0"
-                    value={experience}
-                    onChange={(e) => setExperience(e.target.value)}
+                    ref={experienceRef}
+
                   />
                 </div>
 
